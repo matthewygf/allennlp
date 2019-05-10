@@ -272,6 +272,8 @@ class Trainer(TrainerBase):
                                    " 'loss' key in the output of model.forward(inputs).")
             loss = None
 
+        del output_dict
+
         return loss
 
     def _train_epoch(self, epoch: int) -> Dict[str, float]:
@@ -394,6 +396,9 @@ class Trainer(TrainerBase):
                 self._save_checkpoint(
                         '{0}.{1}'.format(epoch, training_util.time_to_str(int(last_save_time)))
                 )
+
+            del loss
+
         metrics = training_util.get_metrics(self.model, train_loss, batches_this_epoch, reset=True)
         metrics['cpu_memory_MB'] = peak_cpu_usage
         for (gpu_num, memory) in gpu_usage:
