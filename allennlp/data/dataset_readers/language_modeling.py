@@ -84,7 +84,7 @@ class LanguageModelingReader(DatasetReader):
         else:
             tokenized_strings = [self._tokenizer.tokenize(s) for s in instance_strings]
 
-        for index, tokenized_string in enumerate(tokenized_strings):
+        for tokenized_string in tokenized_strings:
             if len(tokenized_string) <= 6: continue # skip short sentence
             tokenized_string = list(tokenized_string)
             tokenized_string.insert(0, Token(START_SYMBOL))
