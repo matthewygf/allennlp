@@ -7,11 +7,13 @@ from allennlp.common.file_utils import cached_path
 from allennlp.common.tqdm import Tqdm
 from allennlp.data.instance import Instance
 from allennlp.data.tokenizers.tokenizer import Tokenizer
+from allennlp.common.util import START_SYMBOL, END_SYMBOL
 from allennlp.data.tokenizers import WordTokenizer
 from allennlp.data.dataset_readers.dataset_reader import DatasetReader
 from allennlp.data.token_indexers.token_indexer import TokenIndexer
 from allennlp.data.fields import TextField
 from allennlp.data.token_indexers import SingleIdTokenIndexer
+from allennlp.data.tokenizers import Token
 
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -68,7 +70,7 @@ class LanguageModelingReader(DatasetReader):
         # if `file_path` is a URL, redirect to the cache
         file_path = cached_path(file_path)
 
-        with open(file_path, "r") as text_file:
+        with open(file_path, "r", encoding="utf8") as text_file:
             instance_strings = text_file.readlines()
 
         if self._tokens_per_instance is not None:
@@ -82,7 +84,11 @@ class LanguageModelingReader(DatasetReader):
         else:
             tokenized_strings = [self._tokenizer.tokenize(s) for s in instance_strings]
 
-        for tokenized_string in tokenized_strings:
+        for index, tokenized_string in enumerate(tokenized_strings):
+            if len(tokenized_string) <= 6: continue # skip short sentence
+            tokenized_string = list(tokenized_string)
+            tokenized_string.insert(0, Token(START_SYMBOL))
+            tokenized_string.append(Token(END_SYMBOL))
             input_field = TextField(tokenized_string[:-1], self._token_indexers)
             output_field = TextField(tokenized_string[1:], self._output_indexer)
             yield Instance({'input_tokens': input_field,
