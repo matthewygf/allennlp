@@ -76,7 +76,7 @@ class Seq2SeqDatasetReader(DatasetReader):
         # Reset exceeded counts
         self._source_max_exceeded = 0
         self._target_max_exceeded = 0
-        with open(cached_path(file_path), "r") as data_file:
+        with open(cached_path(file_path), "r", encoding='UTF-8') as data_file:
             logger.info("Reading instances from lines in file at: %s", file_path)
             for line_num, row in enumerate(csv.reader(data_file, delimiter=self._delimiter)):
                 if len(row) != 2:
